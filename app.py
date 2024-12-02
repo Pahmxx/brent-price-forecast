@@ -1,3 +1,5 @@
+import streamlit as st
+
 def main():
     # Configuração da página
     st.set_page_config(page_title='MVP para análise temporal de petróleo',
