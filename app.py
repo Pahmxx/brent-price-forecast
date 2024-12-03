@@ -4,3 +4,7 @@ def main():
                        page_icon='🛢️')
 
     st.write('# MVP para análise de preço do petróleo Brent')
+
+    if name == "main":
+        main()
+
