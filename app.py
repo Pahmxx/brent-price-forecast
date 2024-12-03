@@ -8,20 +8,13 @@ import requests
 import numpy as np
 
 # Função para carregar os dados e ajustar o modelo ARIMA
-@st.cache_resource
-def carregar_modelo():
-    # URL do modelo Prophet salvo no Google Drive
-    #https://drive.google.com/file/d/11eL3dI9aeUGjVKUSDGrDccLJ4tPQMHTD/view?usp=sharing
-    url = 'https://drive.google.com/uc?id=11eL3dI9aeUGjVKUSDGrDccLJ4tPQMHTD'
-    
-    # Fazer o download do modelo
-    gdown.download(url, 'prophet_model.pkl', quiet=False)
-    
-    # Carregar o modelo Prophet com pickle
-    with open('prophet_model.pkl', 'rb') as f:
-        modelo = pickle.load(f)
-    
-    return modelo
+def forecast_model(data, steps=1):
+    modelo = ARIMA(data['preco'], order=(2, 1, 2))
+    modelo_fit = modelo.fit()
+    forecast = modelo_fit.forecast(steps=steps)
+    forecast_index = pd.date_range(start=data.index[-1] + pd.Timedelta(days=1), periods=steps, freq='D')
+    forecast_series = pd.Series(forecast, index=forecast_index)
+    return forecast_series
 
 # Baixar o arquivo Excel
 url = 'https://raw.githubusercontent.com/marialuisamartins/tech_fase4/6ad3e07bc901fd984eedb3030510b2816aaf7383/ipeadata%5B03-11-2024-01-09%5D.xlsx'
@@ -189,7 +182,3 @@ elif analise_opcao == "Distribuição dos Preços":
     ax7.set_xlabel('Preço (USD)')
     ax7.set_ylabel('Frequência')
     st.pyplot(fig7)
-
-if name == "main":
-    main()
-
