@@ -81,6 +81,33 @@ st.markdown("### Previsão de Preço do Petróleo")
 st.write(f"**Previsão para hoje**: ${previsao_hoje.iloc[0]:,.2f}")
 st.write(f"**Previsão para amanhã**: ${previsao_amanha:,.2f} {icone_tendencia} ({tendencia})")
 
+# Simulação de previsão de preços futuros com limite de 10 dias
+st.markdown("### Simulação de Previsão de Preço do Petróleo")
+dias_previsao = st.slider("Quantos dias você quer prever?", min_value=1, max_value=10, value=5)
+
+# Executar a previsão com base no número de dias selecionados
+previsao_futura = forecast_model(ipeadata_filtered, steps=dias_previsao)
+
+# Exibir a tabela de previsões apenas com datas futuras
+previsao_df = pd.DataFrame({
+    "Data de Previsão": previsao_futura.index,
+    "Previsão de Preço (USD)": previsao_futura.values
+})
+st.dataframe(previsao_df.style.set_table_styles(
+    [{'selector': 'thead th', 'props': [('background-color', '#4CAF50'), ('color', 'white')]}]
+).format({"Previsão de Preço (USD)": "${:,.2f}".format}).set_caption(f"Previsão para os próximos {dias_previsao} dias"))
+
+# Gráfico da previsão futura
+st.markdown("### Gráfico da Previsão Futura")
+fig3, ax3 = plt.subplots(figsize=(14, 6))
+ax3.plot(ipeadata_filtered.index, ipeadata_filtered['preco'], label='Preço Histórico', color='blue', alpha=0.5)
+ax3.plot(previsao_futura.index, previsao_futura, label=f'Previsão para {dias_previsao} dias', color='green', linewidth=2)
+ax3.set_title(f"Previsão do Preço do Petróleo para {dias_previsao} Dias")
+ax3.set_xlabel("Data")
+ax3.set_ylabel("Preço (USD)")
+ax3.legend()
+st.pyplot(fig3)
+
 # Gráfico comparativo de preços de diferentes anos
 st.markdown("### Comparação de Preços de Diferentes Anos")
 ipeadata_filtered['year'] = ipeadata_filtered.index.year
